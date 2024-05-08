@@ -1,0 +1,138 @@
+asyncapi: 2.6.0
+id: https://github.com/hrosasnutz/notificationMessageApplication
+info:
+  title: Notification Message Application
+  version: 1.0.0
+  description: Sample SB project with Async API
+  contact:
+    name: hrosasnutz
+    url: https://github.com/hrosasnutz
+    email: hrosasnutz.1991@gmail.com
+  license:
+    name: Apache License 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+defaultContentType: application/json
+servers:
+  local:
+    protocol: kafka
+    url: kafka:9092
+    description: Local server of kafka
+tags:
+  - name: Notification Message Application
+  - name: Async API
+  - name: Spring Cloud Stream
+  - name: Kafka
+channels:
+  notificationMessageChannel:
+    description: Notification Message Channel
+    subscribe:
+      operationId: notificationMessageSub
+      message:
+        $ref: '#/components/messages/notificationMessage'
+components:
+  messages:
+    notificationMessage:
+      messageId: notificationMessage
+      contentType: application/json
+      name: NotificationMessage
+      headers:
+        $ref: '#/components/schemas/cloudEventHeaders'
+      payload:
+        $ref: '#/components/schemas/notificationData'
+  schemas:
+    cloudEventHeaders:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Identifies the event. Producers MUST ensure that source + id is unique for each distinct event. If a duplicate event is re-sent (e.g. due to a network error) it MAY have the same id. Consumers MAY assume that Events with identical source and id are duplicates.
+          examples:
+            - 868af934-8cda-454f-8260-4e6a71fcb133
+        source:
+          type: string
+          format: uri
+          description: Identifies the context in which an event happened. Often this will include information such as the type of the event source, the organization publishing the event or the process that produced the event. The exact syntax and semantics behind the data encoded in the URI is defined by the event producer.
+          examples:
+            - https://github.com/cloudevents
+            - urn:uuid:6e8bc430-9c3a-11d9-9669-0800200c9a66
+            - /cloudevents/spec/pull/123
+        specversion:
+          type: string
+          description: This attribute contains a value describing the type of event related to the originating occurrence. Often this attribute is used for routing, observability, policy enforcement, etc. The format of this is producer defined and might include information such as the version of the type - see Versioning of CloudEvents in the Primer for more information.
+          examples:
+            - com.github.pull_request.opened
+            - com.example.object.deleted.v2
+        time:
+          type: string
+          format: date-time
+          description: Timestamp of when the occurrence happened. If the time of the occurrence cannot be determined then this attribute MAY be set to some other time (such as the current time) by the CloudEvents producer, however all producers for the same source MUST be consistent in this respect. In other words, either they all use the actual time of the occurrence or they all use the same algorithm to determine the value used.
+      required:
+        - id
+        - source
+        - specversion
+    notificationData:
+      title: NotificationData
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Id of message
+          examples:
+            - 868af934-8cda-454f-8260-4e6a71fcb133
+        subject:
+          type: string
+          description: Subject of message
+          examples:
+            - Meet with customers.
+        content:
+          type: string
+          description: Content of message
+          examples:
+            - Hello dears, this message is a ...
+        receptors:
+          type: array
+          items:
+            type: string
+            format: email
+            description: Receptor of message
+          uniqueItems: true
+          description: Receptors of message
+          examples:
+            - [jhondoe@mymail.com, janedoe@mymail.com]
+        order:
+          type: integer
+          format: int64
+          description: Order of message
+          examples:
+            - 1
+        status:
+          type: string
+          enum:
+            - SENT
+            - RECEIVED
+            - READ
+          title: NotificationMessageStatus
+          description: Status of message
+        attachments:
+          type: array
+          items:
+            type: string
+            format: byte
+          description: Attachments of message
+          examples:
+            - [base64EncodedFile]
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp of message
+          examples:
+            - 2024-05-01T18:24:40.312199800
+      required:
+        - id
+        - subject
+        - message
+        - receptors
+        - status
+        - timestamp

@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: scs_asyncapi_demo_b
+  cloud:
+    function:
+      definition: notificationMessageSub
+    stream:
+      bindings:
+        notificationMessageSub-in-0:
+          destination: notification_message_topic.v1
+          group: ${spring.application.name}
+          error-handler-definition: notificationMessageSubErrorHandler
+          
+springwolf:
+  use-fqn: false
+  docket:
+    base-package: io.codegitters.scs_asyncapi_demo_a
+    info:
+      title: ${spring.application.name}
+      version: 1.0.0
+      description: Sample SB project with Async API
+      terms-of-service: https://www.asyncapi.com/en
+      contact:
+        name: hrosasnutz
+        email: hrosasnutz.1991@gmail.com
+        url: https://github.com/hrosasnutz
+      license:
+        name: Apache License 2.0
+    servers:
+      kafka:
+        protocol: kafka
+        host: ${spring.cloud.stream.kafka.binder.brokers}
